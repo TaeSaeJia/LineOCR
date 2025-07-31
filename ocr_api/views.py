@@ -14,7 +14,11 @@ class HomeView(TemplateView):
     template_name = "home.html"
 
 
-ocr_model = PaddleOCR(use_angle_cls=True, lang='en')  # หรือ 'th' สำหรับภาษาไทย
+ocr_model = PaddleOCR(
+    use_doc_orientation_classify=True,
+    use_doc_unwarping=False,
+    use_textline_orientation=False,
+    lang='japan')
 
 class OCRView(APIView):
     parser_classes = [MultiPartParser]
