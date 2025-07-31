@@ -9,15 +9,17 @@ from paddleocr import PaddleOCR
 import tempfile
 from .extraction import extrac_total_prize, extrac_date_branch
 from django.views.generic import TemplateView
+import os
 
 class HomeView(TemplateView):
     template_name = "home.html"
 
 
-ocr_model = PaddleOCR(
+PaddleOCR(
     use_doc_orientation_classify=True,
     use_doc_unwarping=False,
     use_textline_orientation=False,
+    ocr_version='PP-OCRv5',
     lang='japan')
 
 class OCRView(APIView):
@@ -31,12 +33,18 @@ class OCRView(APIView):
         image_file = request.FILES.get('image')
         if not image_file:
             return Response({'error': 'No image provided'}, status=status.HTTP_400_BAD_REQUEST)
-
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_img:
+        
+        ocr_model = PaddleOCR(
+            use_doc_orientation_classify=True,
+            use_doc_unwarping=False,
+            use_textline_orientation=False,
+            ocr_version='PP-OCRv5',
+            lang='japan')
+        
+        with tempfile.NamedTemporaryFile(delete=True, suffix=".jpg") as temp_img:
             for chunk in image_file.chunks():
                 temp_img.write(chunk)
             temp_img.flush()
-            print(temp_img.name)
             result = ocr_model.predict(temp_img.name)
 
         # แปลงผลลัพธ์เป็น JSON-friendly format
