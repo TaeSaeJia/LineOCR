@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>OCR Upload</title>
+</head>
+<body>
+  <h1>Upload image for OCR</h1>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="image" required>
+    <button type="submit">Upload</button>
+  </form>
+
+  {% if error %}
+    <p style="color:red;">{{ error }}</p>
+  {% endif %}
+
+  {% if result %}
+    <h2>OCR Result</h2>
+    <ul>
+      {% for item in result %}
+        <li>
+          <strong>{{ item.text }}</strong> (confidence: {{ item.confidence|floatformat:2 }})
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</body>
+</html>
