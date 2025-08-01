@@ -15,13 +15,6 @@ class HomeView(TemplateView):
     template_name = "home.html"
 
 
-PaddleOCR(
-    use_doc_orientation_classify=True,
-    use_doc_unwarping=False,
-    use_textline_orientation=False,
-    ocr_version='PP-OCRv5',
-    lang='japan')
-
 class OCRView(APIView):
     parser_classes = [MultiPartParser]
     
@@ -34,17 +27,17 @@ class OCRView(APIView):
         if not image_file:
             return Response({'error': 'No image provided'}, status=status.HTTP_400_BAD_REQUEST)
         
-        ocr_model = PaddleOCR(
-            use_doc_orientation_classify=True,
-            use_doc_unwarping=False,
-            use_textline_orientation=False,
-            ocr_version='PP-OCRv5',
-            lang='japan')
         
         with tempfile.NamedTemporaryFile(delete=True, suffix=".jpg") as temp_img:
             for chunk in image_file.chunks():
                 temp_img.write(chunk)
             temp_img.flush()
+            ocr_model = PaddleOCR(
+                            use_doc_orientation_classify=True,
+                            use_doc_unwarping=False,
+                            use_textline_orientation=False,
+                            ocr_version='PP-OCRv5',
+                            lang='japan')
             result = ocr_model.predict(temp_img.name)
 
         # แปลงผลลัพธ์เป็น JSON-friendly format
