@@ -1,0 +1,7 @@
+<h2>Users</h2>
+<ul>
+  {% for u in users %}
+    <li>{{ u.display_name }} - Campaign ID: {{ u.campaign_id }}</li>
+  {% endfor %}
+</ul>
+<a href="{% url 'user_form' %}">Add new user</a>

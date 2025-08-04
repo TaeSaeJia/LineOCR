@@ -7,17 +7,9 @@ from line_app.models import User,Campaign
 class Receipt(models.Model):
     id = models.AutoField('receipt_id', primary_key=True)
     
-    user_id = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='user_receipt'
-    )
+    user_id = models.IntegerField('user_id')
     
-    campaign_id = models.ForeignKey(
-        Campaign,
-        on_delete=models.CASCADE,
-        related_name='campaign_receipt'
-    )
+    campaign_id = models.IntegerField('campaign_id')
     
     image_path = models.ImageField(upload_to='raw_image/')
     

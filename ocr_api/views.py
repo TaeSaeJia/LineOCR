@@ -10,6 +10,8 @@ import tempfile
 from .extraction import extrac_total_prize, extrac_date_branch
 from django.views.generic import TemplateView
 import os
+from .models import Receipt
+from .serializers import ReceiptSerializer
 
 class HomeView(TemplateView):
     template_name = "home.html"
@@ -41,14 +43,18 @@ class OCRView(APIView):
             result = ocr_model.predict(temp_img.name)
 
         # แปลงผลลัพธ์เป็น JSON-friendly format
-        output = []
-        for picture in result:
-            output.append({
-                'total' : extrac_total_prize(picture['rec_texts']),
-                "date" : extrac_date_branch(picture['rec_texts']),
-                'texts': picture['rec_texts'],
-                'confidence': picture['rec_scores'],
-                'box': picture['rec_polys']
-            })
 
-        return Response(output, status=status.HTTP_200_OK)
+        for picture in result:
+            ocr_result = Receipt.objects.create(
+            user_id=1,
+            campaign_id=1,
+            image_path=image_file,
+            detection={ 'texts': picture['rec_texts'],
+                'confidence': picture['rec_scores'],
+                'box': np.array(picture['rec_polys']).tolist()
+            },
+            parsed_data = {'total' : extrac_total_prize(picture['rec_texts']),
+                "date" : extrac_date_branch(picture['rec_texts']),}
+        )
+            serializer = ReceiptSerializer(ocr_result)
+        return Response(serializer.data, status=status.HTTP_200_OK)

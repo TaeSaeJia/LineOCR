@@ -1,0 +1,7 @@
+<h2>Campaigns</h2>
+<ul>
+  {% for c in campaigns %}
+    <li>{{ c.name }} ({{ c.benefit_type }})</li>
+  {% endfor %}
+</ul>
+<a href="{% url 'campaign_form' %}">Add new campaign</a>
