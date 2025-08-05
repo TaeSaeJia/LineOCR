@@ -3,7 +3,6 @@ from line_app.models import User,Campaign
 
 # Create your models here.
 
-
 class Receipt(models.Model):
     id = models.AutoField('receipt_id', primary_key=True)
     
