@@ -16,8 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from ocr_api.views import HomeView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('ocr_api.urls')),
+    path('', HomeView.as_view(), name='home'),
+    path('ocr/', include('ocr_api.urls')),
+    path('line/', include('line_app.urls')),
 ]
