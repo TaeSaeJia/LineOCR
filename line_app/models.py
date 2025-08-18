@@ -8,7 +8,9 @@ class Campaign(models.Model):
     
     benefit_type = models.CharField()
     
-    benefit_value = models.ImageField()
+    benefit_value = models.IntegerField()
+    
+    min_purchase_amount = models.IntegerField()
     
     start_date = models.DateField()
     

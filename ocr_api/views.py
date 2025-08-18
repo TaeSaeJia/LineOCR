@@ -12,6 +12,7 @@ from django.views.generic import TemplateView
 import os
 from .models import Receipt
 from .serializers import ReceiptSerializer
+import easyocr
 
 class HomeView(TemplateView):
     template_name = "home.html"
@@ -57,4 +58,42 @@ class OCRView(APIView):
                 "date" : extrac_date_branch(picture['rec_texts']),}
         )
             serializer = ReceiptSerializer(ocr_result)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class THOCRView(APIView):
+    def get(self, request):
+        # render หน้า form HTML
+        return render(request, 'ocr_form.html')
+    
+    def post(self, request, *args, **kwargs):
+        image_file = request.FILES.get('image')
+        if not image_file:
+            return Response({'error': 'No image provided'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+        with tempfile.NamedTemporaryFile(delete=True, suffix=".jpg") as temp_img:
+            for chunk in image_file.chunks():
+                temp_img.write(chunk)
+            temp_path = temp_img.name
+            reader = easyocr.Reader(['en','th'],gpu=False)
+            img = cv2.imread(temp_img.name)
+            result = reader.readtext(img)
+            
+            detection = {'texts' : [],
+                         'confidence': [],
+                         'box': []}
+            for box, text, score in result :
+                detection['texts'].append(text)
+                detection['confidence'].append(float(score))
+                detection['box'].append(np.array(box).tolist())
+        ocr_result = Receipt.objects.create(
+            user_id=1,
+            campaign_id=1,
+            image_path=image_file,
+            detection=detection,
+            parsed_data = {'total' : [],
+                "date" : [] }
+        )
+            
+        serializer = ReceiptSerializer(ocr_result)
         return Response(serializer.data, status=status.HTTP_200_OK)
